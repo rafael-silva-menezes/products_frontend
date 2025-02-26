@@ -38,7 +38,7 @@ const UploadForm: React.FC<UploadFormProps> = ({
       const response = await axios.post('http://localhost:3000/products/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log('Upload completed:', new Date().toISOString()); // Log end time
+      console.log('Upload completed:', new Date().toISOString());
   
       if (response.status === 200) {
         setUploadSuccess(true);
@@ -53,7 +53,7 @@ const UploadForm: React.FC<UploadFormProps> = ({
       setIsUploading(false);
     }
   };
-  
+
   return (
     <div className="upload-form">
       <input
