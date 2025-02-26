@@ -40,12 +40,12 @@ const UploadForm: React.FC<UploadFormProps> = ({
       });
       console.log('Upload response:', response.data);
 
-      if (response.status === 201) {
+      if (response.status >= 200 && response.status < 300) {
         console.log('Upload successful, fetching products...');
         const productsResponse = await axios.get('http://localhost:8000/products');
         console.log('Products fetched:', productsResponse.data);
-        setProducts(productsResponse.data); // Define os produtos
-        setUploadSuccess(true); // Marca como sucesso
+        setProducts(productsResponse.data); // Sets the products
+        setUploadSuccess(true); // Marks upload as successful
         console.log('State updated: uploadSuccess=true, products set');
       }
     } catch (error: any) {

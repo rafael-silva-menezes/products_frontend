@@ -19,7 +19,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<string>('ASC');
 
-  // Atualiza produtos quando initialProducts muda
+  // Update products when initialProducts changes
   React.useEffect(() => {
     console.log('Initial products received:', initialProducts);
     setProducts(initialProducts);
@@ -43,7 +43,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFilter = e.target.value;
     setFilterName(newFilter);
-    if (newFilter) fetchProducts(newFilter, sortBy, sortOrder); // Só busca se há filtro
+    if (newFilter) fetchProducts(newFilter, sortBy, sortOrder); // Only fetch if filter is provided
   };
 
   const handleSortChange = (field: string) => {
