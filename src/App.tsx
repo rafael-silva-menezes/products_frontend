@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import './styles.css';
 import './index.css';
+import './styles.css';
 import UploadForm from './components/UploadForm';
 import LoadingIndicator from './components/LoadingIndicator';
 import ProductTable from './components/ProductTable';
@@ -25,7 +25,7 @@ const App: React.FC = () => {
       {isUploading && <LoadingIndicator />}
       {uploadSuccess && (
         <div>
-          <p className="success-message">Upload concluído com sucesso!</p>
+          <p className="success-message">Upload completed successfully!</p>
           <ProductTable products={products} />
         </div>
       )}

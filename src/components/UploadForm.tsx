@@ -25,37 +25,35 @@ const UploadForm: React.FC<UploadFormProps> = ({
   };
 
   const handleUpload = async () => {
-    if (!file) return; // Does nothing if no file has been selected
-
-    setIsUploading(true); // Activate the loading indicator
-    setUploadSuccess(false); // Reset previous success
-
+    if (!file) return;
+  
+    console.log('Upload started:', new Date().toISOString()); // Log start time
+    setIsUploading(true);
+    setUploadSuccess(false);
+  
     const formData = new FormData();
-    formData.append('file', file); // Add file to FormData
-
+    formData.append('file', file);
+  
     try {
-      // Sends the file to the backend endpoint
       const response = await axios.post('http://localhost:3000/products/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
+      console.log('Upload completed:', new Date().toISOString()); // Log end time
+  
       if (response.status === 200) {
-        setUploadSuccess(true); // Marks the upload as successful
-        // After success, fetches the products from the backend
+        setUploadSuccess(true);
         const productsResponse = await axios.get('http://localhost:3000/products');
-        setProducts(productsResponse.data); // Updates the product list
+        setProducts(productsResponse.data);
       }
     } catch (error: any) {
-      console.error('Error sending file:', error);
+      console.error('Upload failed:', error.response?.data?.message || error.message);
       alert(`Upload error: ${error.response?.data?.message || 'Unknown error'}`);
       setUploadSuccess(false);
     } finally {
-      setIsUploading(false); // Deactivate the loading indicator
+      setIsUploading(false);
     }
   };
-
+  
   return (
     <div className="upload-form">
       <input
