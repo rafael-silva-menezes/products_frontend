@@ -1,0 +1,39 @@
+.app {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .upload-form {
+    margin-bottom: 20px;
+  }
+  
+  .upload-form input,
+  .upload-form button {
+    margin: 10px;
+  }
+  
+  .success-message {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .loading-indicator {
+    margin: 20px 0;
+  }
+  
+  .product-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .product-table th,
+  .product-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .product-table th {
+    background-color: #f2f2f2;
+  }

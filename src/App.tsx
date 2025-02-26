@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import './styles.css';
+import './index.css';
+import UploadForm from './components/UploadForm';
+import LoadingIndicator from './components/LoadingIndicator';
+import ProductTable from './components/ProductTable';
 
-function App() {
+const App: React.FC = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <h1>Flatirons Product Upload</h1>
+      <UploadForm
+        file={file}
+        setFile={setFile}
+        isUploading={isUploading}
+        setIsUploading={setIsUploading}
+        setUploadSuccess={setUploadSuccess}
+        setProducts={setProducts}
+      />
+      {isUploading && <LoadingIndicator />}
+      {uploadSuccess && (
+        <div>
+          <p className="success-message">Upload concluído com sucesso!</p>
+          <ProductTable products={products} />
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default App;
