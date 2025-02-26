@@ -28,7 +28,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
           sortBy,
           order: sortOrder,
         };
-        const response = await axios.get('http://localhost:3000/products', { params });
+        const response = await axios.get('http://localhost:8000/products', { params });
         setProducts(response.data);
         console.log('Products fetched:', response.data.length); // Log number of products fetched
       } catch (error: any) {

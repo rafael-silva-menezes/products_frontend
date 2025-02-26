@@ -35,14 +35,14 @@ const UploadForm: React.FC<UploadFormProps> = ({
     formData.append('file', file);
   
     try {
-      const response = await axios.post('http://localhost:3000/products/upload', formData, {
+      const response = await axios.post('http://localhost:8000/products/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       console.log('Upload completed:', new Date().toISOString());
   
       if (response.status === 200) {
         setUploadSuccess(true);
-        const productsResponse = await axios.get('http://localhost:3000/products');
+        const productsResponse = await axios.get('http://localhost:8000/products');
         setProducts(productsResponse.data);
       }
     } catch (error: any) {
