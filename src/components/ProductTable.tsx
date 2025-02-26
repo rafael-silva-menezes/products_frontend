@@ -19,39 +19,38 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<string>('ASC');
 
-  // Fetch products when filter or sort changes
+  // Atualiza produtos quando initialProducts muda (após upload)
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const params = {
-          name: filterName || undefined, // Omit if empty
-          sortBy,
-          order: sortOrder,
-        };
-        const response = await axios.get('http://localhost:8000/products', { params });
-        setProducts(response.data);
-        console.log('Products fetched:', response.data.length); // Log number of products fetched
-      } catch (error: any) {
-        console.error('Error fetching products:', error.response?.data?.message || error.message);
-      }
-    };
+    setProducts(initialProducts);
+    console.log('Initial products updated:', initialProducts.length);
+  }, [initialProducts]);
 
-    fetchProducts();
-  }, [filterName, sortBy, sortOrder]);
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterName(e.target.value);
+  const fetchProducts = async (name: string, sort: string, order: string) => {
+    try {
+      const params = {
+        name: name || undefined,
+        sortBy: sort,
+        order: order,
+      };
+      const response = await axios.get('http://localhost:8000/products', { params });
+      setProducts(response.data);
+      console.log('Products fetched:', response.data.length);
+    } catch (error: any) {
+      console.error('Error fetching products:', error.response?.data?.message || error.message);
+    }
   };
 
-  const handleSortChange = (field: string) => {
-    if (sortBy === field) {
-      // Toggle order if clicking the same field
-      setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
-    } else {
-      // Set new sort field and default to ASC
-      setSortBy(field);
-      setSortOrder('ASC');
-    }
+  const handleFilterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newFilter = e.target.value;
+    setFilterName(newFilter);
+    if (newFilter) await fetchProducts(newFilter, sortBy, sortOrder); // Só busca se há filtro
+  };
+
+  const handleSortChange = async (field: string) => {
+    const newSortOrder = sortBy === field && sortOrder === 'ASC' ? 'DESC' : 'ASC';
+    setSortBy(field);
+    setSortOrder(newSortOrder);
+    await fetchProducts(filterName, field, newSortOrder);
   };
 
   return (
@@ -84,13 +83,19 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td>{product.name}</td>
-              <td>${product.price.toFixed(2)}</td>
-              <td>{product.expiration}</td>
+          {products.length > 0 ? (
+            products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>${product.price.toFixed(2)}</td>
+                <td>{product.expiration}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={3}>No products to display</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

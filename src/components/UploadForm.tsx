@@ -27,7 +27,7 @@ const UploadForm: React.FC<UploadFormProps> = ({
   const handleUpload = async () => {
     if (!file) return;
   
-    console.log('Upload started:', new Date().toISOString()); // Log start time
+    console.log('Upload started:', new Date().toISOString());
     setIsUploading(true);
     setUploadSuccess(false);
   
@@ -38,11 +38,13 @@ const UploadForm: React.FC<UploadFormProps> = ({
       const response = await axios.post('http://localhost:8000/products/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log('Upload completed:', new Date().toISOString());
+      console.log('Upload response:', response.data);
   
       if (response.status === 200) {
+        console.log('Upload successful, setting state...');
         setUploadSuccess(true);
         const productsResponse = await axios.get('http://localhost:8000/products');
+        console.log('Products fetched:', productsResponse.data);
         setProducts(productsResponse.data);
       }
     } catch (error: any) {
@@ -51,6 +53,7 @@ const UploadForm: React.FC<UploadFormProps> = ({
       setUploadSuccess(false);
     } finally {
       setIsUploading(false);
+      console.log('Upload process finished');
     }
   };
 
