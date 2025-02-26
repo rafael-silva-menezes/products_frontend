@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 interface Product {
@@ -19,10 +19,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<string>('ASC');
 
-  // Atualiza produtos quando initialProducts muda (após upload)
-  useEffect(() => {
+  // Atualiza produtos quando initialProducts muda
+  React.useEffect(() => {
+    console.log('Initial products received:', initialProducts);
     setProducts(initialProducts);
-    console.log('Initial products updated:', initialProducts.length);
   }, [initialProducts]);
 
   const fetchProducts = async (name: string, sort: string, order: string) => {
@@ -34,23 +34,23 @@ const ProductTable: React.FC<ProductTableProps> = ({ products: initialProducts }
       };
       const response = await axios.get('http://localhost:8000/products', { params });
       setProducts(response.data);
-      console.log('Products fetched:', response.data.length);
+      console.log('Products fetched from filter/sort:', response.data);
     } catch (error: any) {
       console.error('Error fetching products:', error.response?.data?.message || error.message);
     }
   };
 
-  const handleFilterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFilter = e.target.value;
     setFilterName(newFilter);
-    if (newFilter) await fetchProducts(newFilter, sortBy, sortOrder); // Só busca se há filtro
+    if (newFilter) fetchProducts(newFilter, sortBy, sortOrder); // Só busca se há filtro
   };
 
-  const handleSortChange = async (field: string) => {
+  const handleSortChange = (field: string) => {
     const newSortOrder = sortBy === field && sortOrder === 'ASC' ? 'DESC' : 'ASC';
     setSortBy(field);
     setSortOrder(newSortOrder);
-    await fetchProducts(filterName, field, newSortOrder);
+    fetchProducts(filterName, field, newSortOrder);
   };
 
   return (

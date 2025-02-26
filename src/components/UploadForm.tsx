@@ -26,26 +26,27 @@ const UploadForm: React.FC<UploadFormProps> = ({
 
   const handleUpload = async () => {
     if (!file) return;
-  
+
     console.log('Upload started:', new Date().toISOString());
     setIsUploading(true);
     setUploadSuccess(false);
-  
+
     const formData = new FormData();
     formData.append('file', file);
-  
+
     try {
       const response = await axios.post('http://localhost:8000/products/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       console.log('Upload response:', response.data);
-  
-      if (response.status === 200) {
-        console.log('Upload successful, setting state...');
-        setUploadSuccess(true);
+
+      if (response.status === 201) {
+        console.log('Upload successful, fetching products...');
         const productsResponse = await axios.get('http://localhost:8000/products');
         console.log('Products fetched:', productsResponse.data);
-        setProducts(productsResponse.data);
+        setProducts(productsResponse.data); // Define os produtos
+        setUploadSuccess(true); // Marca como sucesso
+        console.log('State updated: uploadSuccess=true, products set');
       }
     } catch (error: any) {
       console.error('Upload failed:', error.response?.data?.message || error.message);
