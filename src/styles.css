@@ -55,3 +55,27 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+  /* Existing styles remain unchanged */
+
+.product-table .controls {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-table input {
+  padding: 5px;
+  width: 200px;
+}
+
+.product-table .sort-buttons button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.product-table .sort-buttons button.active {
+  font-weight: bold;
+}
