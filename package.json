@@ -11,6 +11,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "axios": "^1.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
@@ -18,10 +19,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start:backend": "cd backend && npm run start:dev",
+    "start:frontend": "cd frontend && npm run start",
+    "start": "npm run start:backend & npm run start:frontend",
   },
   "eslintConfig": {
     "extends": [
