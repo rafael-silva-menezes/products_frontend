@@ -37,6 +37,33 @@ export function ProductsTable() {
     .filter((status) => status?.errors && status.errors.length > 0)
     .flatMap((status) => status.errors || []);
 
+  // Function to export table data to CSV
+  const exportToCsv = () => {
+    const headers = ['Name', 'Price', 'Expiration', 'USD', 'EUR', 'GBP', 'JPY', 'BRL'];
+    const rows = products.map((product) => [
+      `"${sanitizeHtml(product.name, { allowedTags: [] }).replace(/"/g, '""')}"`, // Escape quotes in CSV
+      product.price,
+      product.expiration,
+      product.exchangeRates.USD.toFixed(2),
+      product.exchangeRates.EUR.toFixed(2),
+      product.exchangeRates.GBP.toFixed(2),
+      product.exchangeRates.JPY.toFixed(2),
+      product.exchangeRates.BRL.toFixed(2),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) => row.join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `products_page_${page}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   return (
     <div>
       {allErrors.length > 0 && (
@@ -51,6 +78,11 @@ export function ProductsTable() {
           </ul>
         </div>
       )}
+      <div className="flex justify-end mb-4">
+        <Button onClick={exportToCsv}>
+          Export to CSV
+        </Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -71,8 +103,8 @@ export function ProductsTable() {
                 <span
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(product.name, {
-                      allowedTags: [], 
-                      allowedAttributes: {}, 
+                      allowedTags: [],
+                      allowedAttributes: {},
                     }),
                   }}
                 />
