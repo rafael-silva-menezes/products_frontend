@@ -11,11 +11,33 @@ export function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
   const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
+  const MAX_FILE_SIZE = 1000 * 1024 * 1024;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
+    setErrorMessage(null);
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFile = e.target.files[0];
+
+      if (selectedFile.type !== 'text/csv') {
+        setErrorMessage('Please select a valid CSV file.');
+        setFile(null);
+        setUploadPhase('idle');
+        setMessage(null);
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setErrorMessage('File size exceeds 1GB limit.');
+        setFile(null);
+        setUploadPhase('idle');
+        setMessage(null);
+        return;
+      }
+
+      setFile(selectedFile);
       setUploadPhase('idle');
       setMessage(null);
     }
@@ -97,6 +119,11 @@ export function UploadForm() {
       {message && (
         <p className={`mt-2 text-sm ${uploadPhase === 'failed' ? 'text-red-500' : 'text-gray-700'}`}>
           {message}
+        </p>
+      )}
+      {errorMessage && (
+        <p className="mt-2 text-sm text-red-500">
+          {errorMessage}
         </p>
       )}
     </div>
