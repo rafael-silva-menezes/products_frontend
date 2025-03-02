@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { ProductsResponse, UploadStatus } from '../types';
+import { ProductsResponse, UploadStatus, UploadResponse } from '../types';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
 });
 
-export const uploadCsv = async (file: File): Promise<{ message: string; jobId: string }> => {
+export const uploadCsv = async (file: File): Promise<UploadResponse> => {
   const formData = new FormData();
   formData.append('file', file);
   const response = await api.post('/products/upload', formData, {

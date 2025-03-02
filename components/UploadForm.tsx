@@ -9,7 +9,7 @@ export function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const { setJobId, fetchUploadStatus } = useAppStore();
+  const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -22,17 +22,23 @@ export function UploadForm() {
     setIsLoading(true);
     setMessage(null);
     try {
-      const { jobId } = await uploadCsv(file);
-      setJobId(jobId);
-      let status = await fetchUploadStatus(jobId);
-      while (status.status !== 'completed' && status.status !== 'failed') {
+      const { jobIds } = await uploadCsv(file);
+      setJobIds(jobIds);
+      let allCompletedOrFailed = false;
+      while (!allCompletedOrFailed) {
+        const statuses = await fetchAllUploadStatuses();
+        allCompletedOrFailed = statuses.every(
+          (status) => status.status === 'completed' || status.status === 'failed',
+        );
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        status = await fetchUploadStatus(jobId);
       }
-      if (status.status === 'completed') {
-        setMessage('Upload concluído com sucesso!');
+      const hasErrors = Object.values(useAppStore.getState().uploadStatuses).some(
+        (status) => status.errors && status.errors.length > 0,
+      );
+      if (hasErrors) {
+        setMessage('Upload concluído com erros. Verifique abaixo.');
       } else {
-        setMessage('Upload falhou. Verifique os erros abaixo.');
+        setMessage('Upload concluído com sucesso!');
       }
     } catch (error) {
       setMessage(`Erro no upload: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);

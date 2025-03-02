@@ -13,31 +13,36 @@ import {
 import { useAppStore } from '../lib/store';
 
 export function ProductsTable() {
-  const { jobId, products, uploadStatus, page, totalPages, fetchProducts } = useAppStore();
+  const {
+    jobIds,
+    products,
+    uploadStatuses,
+    page,
+    totalPages,
+    fetchAllUploadStatuses,
+    fetchProducts,
+  } = useAppStore();
 
   useEffect(() => {
-    if (jobId) {
+    if (jobIds.length > 0) {
+      fetchAllUploadStatuses();
       fetchProducts(page);
     }
-  }, [jobId, page, fetchProducts]);
+  }, [jobIds, page, fetchAllUploadStatuses, fetchProducts]);
 
-  const handlePrevious = () => {
-    if (page > 1) fetchProducts(page - 1);
-  };
+  if (jobIds.length === 0) return null;
 
-  const handleNext = () => {
-    if (page < totalPages) fetchProducts(page + 1);
-  };
-
-  if (!jobId) return null;
+  const allErrors = Object.values(uploadStatuses)
+    .filter((status) => status?.errors && status.errors.length > 0)
+    .flatMap((status) => status.errors || []);
 
   return (
     <div>
-      {uploadStatus && uploadStatus.errors && uploadStatus.errors.length > 0 && (
+      {allErrors.length > 0 && (
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-red-600">Erros no Upload</h2>
           <ul className="list-disc pl-5">
-            {uploadStatus.errors.map((error, index) => (
+            {allErrors.map((error, index) => (
               <li key={index} className="text-sm text-red-500">
                 Linha {error.line}: {error.error}
               </li>
@@ -74,11 +79,11 @@ export function ProductsTable() {
         </TableBody>
       </Table>
       <div className="mt-4 flex justify-between">
-        <Button onClick={handlePrevious} disabled={page === 1}>
+        <Button onClick={() => fetchProducts(page - 1)} disabled={page === 1}>
           Anterior
         </Button>
         <span>Página {page} de {totalPages}</span>
-        <Button onClick={handleNext} disabled={page === totalPages}>
+        <Button onClick={() => fetchProducts(page + 1)} disabled={page === totalPages}>
           Próximo
         </Button>
       </div>
