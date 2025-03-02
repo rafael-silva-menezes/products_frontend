@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAppStore } from '../lib/store';
+import sanitizeHtml from 'sanitize-html';
 
 export function ProductsTable() {
   const {
@@ -40,11 +41,11 @@ export function ProductsTable() {
     <div>
       {allErrors.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-red-600">Upload Errors</h2>
+          <h2 className="text-lg font-semibold text-red-600">Errors in Upload</h2>
           <ul className="list-disc pl-5">
             {allErrors.map((error, index) => (
               <li key={index} className="text-sm text-red-500">
-                Row {error.line}: {error.error}
+                Line {error.line}: {error.error}
               </li>
             ))}
           </ul>
@@ -66,7 +67,16 @@ export function ProductsTable() {
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>{product.name}</TableCell>
+              <TableCell>
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(product.name, {
+                      allowedTags: [], // Remove all HTML tags
+                      allowedAttributes: {}, // No attributes allowed
+                    }),
+                  }}
+                />
+              </TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.expiration}</TableCell>
               <TableCell>{product.exchangeRates.USD.toFixed(2)}</TableCell>
