@@ -40,11 +40,11 @@ export function ProductsTable() {
     <div>
       {allErrors.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-red-600">Erros no Upload</h2>
+          <h2 className="text-lg font-semibold text-red-600">Upload Errors</h2>
           <ul className="list-disc pl-5">
             {allErrors.map((error, index) => (
               <li key={index} className="text-sm text-red-500">
-                Linha {error.line}: {error.error}
+                Row {error.line}: {error.error}
               </li>
             ))}
           </ul>
@@ -53,9 +53,9 @@ export function ProductsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Preço</TableHead>
-            <TableHead>Expiração</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Expiration</TableHead>
             <TableHead>USD</TableHead>
             <TableHead>EUR</TableHead>
             <TableHead>GBP</TableHead>
@@ -80,11 +80,11 @@ export function ProductsTable() {
       </Table>
       <div className="mt-4 flex justify-between">
         <Button onClick={() => fetchProducts(page - 1)} disabled={page === 1}>
-          Anterior
+          Previous
         </Button>
-        <span>Página {page} de {totalPages}</span>
+        <span>Page {page} of {totalPages}</span>
         <Button onClick={() => fetchProducts(page + 1)} disabled={page === totalPages}>
-          Próximo
+          Next
         </Button>
       </div>
     </div>

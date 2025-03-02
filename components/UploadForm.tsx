@@ -26,12 +26,12 @@ export function UploadForm() {
 
     try {
       setUploadPhase('uploading');
-      setMessage('Enviando arquivo...');
+      setMessage('Sending file...');
       const { jobIds } = await uploadCsv(file);
       setJobIds(jobIds);
 
       setUploadPhase('processing');
-      setMessage('Arquivo enviado. Processando no backend...');
+      setMessage('File uploaded. Processing on the backend...');
 
       let allCompletedOrFailed = false;
       while (!allCompletedOrFailed) {
@@ -45,7 +45,7 @@ export function UploadForm() {
           0,
         );
         setMessage(
-          `Processando... (${totalProcessed} linhas processadas, ${totalErrors} erros)`,
+          `Processing... (${totalProcessed} rows processed, ${totalErrors} errors)`,
         );
 
         allCompletedOrFailed = statuses.every(
@@ -61,14 +61,14 @@ export function UploadForm() {
       );
       if (hasErrors) {
         setUploadPhase('completed');
-        setMessage('Upload concluído com erros. Verifique abaixo.');
+        setMessage('Upload completed with errors. Check below.');
       } else {
         setUploadPhase('completed');
-        setMessage('Upload concluído com sucesso!');
+        setMessage('Upload completed successfully!');
       }
     } catch (error) {
       setUploadPhase('failed');
-      setMessage(`Erro no upload: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      setMessage(`Upload error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -77,7 +77,7 @@ export function UploadForm() {
   return (
     <div className="mb-8">
       <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-1">
-        Escolha um arquivo CSV
+        Select a CSV file
       </label>
       <input
         id="file-upload"
@@ -88,11 +88,11 @@ export function UploadForm() {
         disabled={uploadPhase === 'uploading' || uploadPhase === 'processing'}
       />
       <Button onClick={handleUpload} disabled={isButtonDisabled}>
-        {uploadPhase === 'uploading' && 'Enviando...'}
-        {uploadPhase === 'processing' && 'Processando...'}
+        {uploadPhase === 'uploading' && 'Sending...'}
+        {uploadPhase === 'processing' && 'Processing...'}
         {uploadPhase === 'idle' && 'Upload'}
-        {uploadPhase === 'completed' && 'Upload Concluído'}
-        {uploadPhase === 'failed' && 'Tentar Novamente'}
+        {uploadPhase === 'completed' && 'Upload Completed'}
+        {uploadPhase === 'failed' && 'Try Again'}
       </Button>
       {message && (
         <p className={`mt-2 text-sm ${uploadPhase === 'failed' ? 'text-red-500' : 'text-gray-700'}`}>
