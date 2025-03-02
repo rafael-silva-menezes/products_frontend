@@ -2,16 +2,14 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { uploadCsv, getUploadStatus } from '../lib/api';
+import { uploadCsv } from '../lib/api';
+import { useAppStore } from '../lib/store';
 
-interface UploadFormProps {
-  onUploadSuccess: (jobId: string) => void;
-}
-
-export function UploadForm({ onUploadSuccess }: UploadFormProps) {
+export function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { setJobId, fetchUploadStatus } = useAppStore();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -25,13 +23,17 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
     setMessage(null);
     try {
       const { jobId } = await uploadCsv(file);
-      let status = await getUploadStatus(jobId);
+      setJobId(jobId);
+      let status = await fetchUploadStatus(jobId);
       while (status.status !== 'completed' && status.status !== 'failed') {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        status = await getUploadStatus(jobId);
+        status = await fetchUploadStatus(jobId);
       }
-      setMessage('Upload concluído com sucesso!');
-      onUploadSuccess(jobId);
+      if (status.status === 'completed') {
+        setMessage('Upload concluído com sucesso!');
+      } else {
+        setMessage('Upload falhou. Verifique os erros abaixo.');
+      }
     } catch (error) {
       setMessage(`Erro no upload: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
