@@ -71,8 +71,8 @@ export function ProductsTable() {
                 <span
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(product.name, {
-                      allowedTags: [], // Remove all HTML tags
-                      allowedAttributes: {}, // No attributes allowed
+                      allowedTags: [], 
+                      allowedAttributes: {}, 
                     }),
                   }}
                 />
