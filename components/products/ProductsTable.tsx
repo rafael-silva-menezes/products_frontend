@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import sanitizeHtml from 'sanitize-html';
@@ -32,8 +32,11 @@ export function ProductsTable() {
 
   const [isMounted, setIsMounted] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   if (!isMounted) {
-    setTimeout(() => setIsMounted(true), 0);
     return null;
   }
 
