@@ -11,7 +11,7 @@ export function useUpload() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
