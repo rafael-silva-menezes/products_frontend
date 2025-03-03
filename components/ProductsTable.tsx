@@ -90,10 +90,12 @@ export function ProductsTable() {
     <div>
       {allErrors.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-red-600">Errors in Upload</h2>
+          <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
+            Errors in Upload
+          </h2>
           <ul className="list-disc pl-5">
             {allErrors.map((error, index) => (
-              <li key={index} className="text-sm text-red-500">
+              <li key={index} className="text-sm text-red-500 dark:text-red-300">
                 Line {error.line}: {error.error}
               </li>
             ))}
@@ -107,26 +109,26 @@ export function ProductsTable() {
             placeholder="Filter by name..."
             value={localNameFilter}
             onChange={(e) => handleFilterChange(setLocalNameFilter, e.target.value, setNameFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-40"
+            className="border border-gray-300 rounded p-2 text-sm w-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           <input
             type="number"
             placeholder="Filter by price..."
             value={localPriceFilter}
             onChange={(e) => handleFilterChange(setLocalPriceFilter, e.target.value, setPriceFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-32"
+            className="border border-gray-300 rounded p-2 text-sm w-32 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           <input
             type="date"
             placeholder="Filter by expiration..."
             value={localExpirationFilter}
             onChange={(e) => handleFilterChange(setLocalExpirationFilter, e.target.value, setExpirationFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-40"
+            className="border border-gray-300 rounded p-2 text-sm w-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           <select
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value))}
-            className="border border-gray-300 rounded p-2 text-sm"
+            className="border border-gray-300 rounded p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           >
             <option value={10}>10 per page</option>
             <option value={20}>20 per page</option>
@@ -139,51 +141,51 @@ export function ProductsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+            <TableHead onClick={() => handleSort('name')} className="cursor-pointer dark:text-gray-300">
               Name {sortBy === 'name' && (order === 'ASC' ? '↑' : '↓')}
             </TableHead>
-            <TableHead onClick={() => handleSort('price')} className="cursor-pointer">
+            <TableHead onClick={() => handleSort('price')} className="cursor-pointer dark:text-gray-300">
               Price {sortBy === 'price' && (order === 'ASC' ? '↑' : '↓')}
             </TableHead>
-            <TableHead onClick={() => handleSort('expiration')} className="cursor-pointer">
+            <TableHead onClick={() => handleSort('expiration')} className="cursor-pointer dark:text-gray-300">
               Expiration {sortBy === 'expiration' && (order === 'ASC' ? '↑' : '↓')}
             </TableHead>
-            <TableHead>USD</TableHead>
-            <TableHead>EUR</TableHead>
-            <TableHead>GBP</TableHead>
-            <TableHead>JPY</TableHead>
-            <TableHead>BRL</TableHead>
+            <TableHead className="dark:text-gray-300">USD</TableHead>
+            <TableHead className="dark:text-gray-300">EUR</TableHead>
+            <TableHead className="dark:text-gray-300">GBP</TableHead>
+            <TableHead className="dark:text-gray-300">JPY</TableHead>
+            <TableHead className="dark:text-gray-300">BRL</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={8} className="text-center dark:text-gray-300">
                 Loading...
               </TableCell>
             </TableRow>
           ) : products.length > 0 ? (
             products.map((product) => (
               <TableRow key={product.id}>
-                <TableCell>
+                <TableCell className="dark:text-gray-200">
                   <span
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(product.name, { allowedTags: [], allowedAttributes: {} }),
                     }}
                   />
                 </TableCell>
-                <TableCell>{product.price}</TableCell>
-                <TableCell>{product.expiration}</TableCell>
-                <TableCell>{product.exchangeRates.USD.toFixed(2)}</TableCell>
-                <TableCell>{product.exchangeRates.EUR.toFixed(2)}</TableCell>
-                <TableCell>{product.exchangeRates.GBP.toFixed(2)}</TableCell>
-                <TableCell>{product.exchangeRates.JPY.toFixed(2)}</TableCell>
-                <TableCell>{product.exchangeRates.BRL.toFixed(2)}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.price}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.expiration}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.exchangeRates.USD.toFixed(2)}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.exchangeRates.EUR.toFixed(2)}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.exchangeRates.GBP.toFixed(2)}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.exchangeRates.JPY.toFixed(2)}</TableCell>
+                <TableCell className="dark:text-gray-200">{product.exchangeRates.BRL.toFixed(2)}</TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={8} className="text-center dark:text-gray-300">
                 No products to display
               </TableCell>
             </TableRow>
@@ -194,7 +196,7 @@ export function ProductsTable() {
         <Button onClick={() => fetchProducts({ page: page - 1 })} disabled={page === 1 || isLoading}>
           Previous
         </Button>
-        <span>Page {page} of {totalPages}</span>
+        <span className="dark:text-gray-300">Page {page} of {totalPages}</span>
         <Button onClick={() => fetchProducts({ page: page + 1 })} disabled={page === totalPages || isLoading}>
           Next
         </Button>
