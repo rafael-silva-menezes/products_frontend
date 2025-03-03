@@ -39,6 +39,7 @@ export function ProductsTable() {
   const [localNameFilter, setLocalNameFilter] = useState(nameFilter);
   const [localPriceFilter, setLocalPriceFilter] = useState(priceFilter);
   const [localExpirationFilter, setLocalExpirationFilter] = useState(expirationFilter);
+  const [isTransitioning, setIsTransitioning] = useState(false); 
 
   useEffect(() => {
     if (jobIds.length > 0) {
@@ -78,12 +79,22 @@ export function ProductsTable() {
     storeSetter: (value: string) => void
   ) => {
     setter(value);
-    setTimeout(() => storeSetter(value), 300); // Debounce de 300ms
+    setTimeout(() => storeSetter(value), 300);
   };
 
   const handleSort = (column: 'name' | 'price' | 'expiration') => {
     const newOrder = sortBy === column && order === 'ASC' ? 'DESC' : 'ASC';
     setSort(column, newOrder);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages && !isLoading) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        fetchProducts({ page: newPage });
+        setIsTransitioning(false);
+      }, 300);
+    }
   };
 
   return (
@@ -138,66 +149,76 @@ export function ProductsTable() {
         </div>
         <Button onClick={exportToCsv}>Export to CSV</Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead onClick={() => handleSort('name')} className="cursor-pointer dark:text-gray-300">
-              Name {sortBy === 'name' && (order === 'ASC' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead onClick={() => handleSort('price')} className="cursor-pointer dark:text-gray-300">
-              Price {sortBy === 'price' && (order === 'ASC' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead onClick={() => handleSort('expiration')} className="cursor-pointer dark:text-gray-300">
-              Expiration {sortBy === 'expiration' && (order === 'ASC' ? '↑' : '↓')}
-            </TableHead>
-            <TableHead className="dark:text-gray-300">USD</TableHead>
-            <TableHead className="dark:text-gray-300">EUR</TableHead>
-            <TableHead className="dark:text-gray-300">GBP</TableHead>
-            <TableHead className="dark:text-gray-300">JPY</TableHead>
-            <TableHead className="dark:text-gray-300">BRL</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
+      <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={8} className="text-center dark:text-gray-300">
-                Loading...
-              </TableCell>
+              <TableHead onClick={() => handleSort('name')} className="cursor-pointer dark:text-gray-300">
+                Name {sortBy === 'name' && (order === 'ASC' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead onClick={() => handleSort('price')} className="cursor-pointer dark:text-gray-300">
+                Price {sortBy === 'price' && (order === 'ASC' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead onClick={() => handleSort('expiration')} className="cursor-pointer dark:text-gray-300">
+                Expiration {sortBy === 'expiration' && (order === 'ASC' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead className="dark:text-gray-300">USD</TableHead>
+              <TableHead className="dark:text-gray-300">EUR</TableHead>
+              <TableHead className="dark:text-gray-300">GBP</TableHead>
+              <TableHead className="dark:text-gray-300">JPY</TableHead>
+              <TableHead className="dark:text-gray-300">BRL</TableHead>
             </TableRow>
-          ) : products.length > 0 ? (
-            products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell className="dark:text-gray-200">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHtml(product.name, { allowedTags: [], allowedAttributes: {} }),
-                    }}
-                  />
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center dark:text-gray-300">
+                  Loading...
                 </TableCell>
-                <TableCell className="dark:text-gray-200">{product.price}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.expiration}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.exchangeRates.USD.toFixed(2)}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.exchangeRates.EUR.toFixed(2)}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.exchangeRates.GBP.toFixed(2)}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.exchangeRates.JPY.toFixed(2)}</TableCell>
-                <TableCell className="dark:text-gray-200">{product.exchangeRates.BRL.toFixed(2)}</TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center dark:text-gray-300">
-                No products to display
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ) : products.length > 0 ? (
+              products.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell className="dark:text-gray-200">
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(product.name, { allowedTags: [], allowedAttributes: {} }),
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className="dark:text-gray-200">{product.price}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.expiration}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.exchangeRates.USD.toFixed(2)}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.exchangeRates.EUR.toFixed(2)}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.exchangeRates.GBP.toFixed(2)}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.exchangeRates.JPY.toFixed(2)}</TableCell>
+                  <TableCell className="dark:text-gray-200">{product.exchangeRates.BRL.toFixed(2)}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center dark:text-gray-300">
+                  No products to display
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <div className="mt-4 flex justify-between">
-        <Button onClick={() => fetchProducts({ page: page - 1 })} disabled={page === 1 || isLoading}>
+        <Button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1 || isLoading}
+          className={isTransitioning ? 'opacity-50' : 'opacity-100'}
+        >
           Previous
         </Button>
         <span className="dark:text-gray-300">Page {page} of {totalPages}</span>
-        <Button onClick={() => fetchProducts({ page: page + 1 })} disabled={page === totalPages || isLoading}>
+        <Button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === totalPages || isLoading}
+          className={isTransitioning ? 'opacity-50' : 'opacity-100'}
+        >
           Next
         </Button>
       </div>

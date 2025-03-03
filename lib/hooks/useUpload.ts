@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { uploadCsv } from '../api';
 import { useAppStore } from '../store';
@@ -9,9 +11,9 @@ export function useUpload() {
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { setJobIds, fetchAllUploadStatuses } = useAppStore();
+  const { setJobIds, fetchAllUploadStatuses, fetchProducts } = useAppStore();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024;
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +81,9 @@ export function useUpload() {
         setMessage('Upload completed successfully!');
         await delay(2000);
       }
-      setFile(null); // Limpar o arquivo após upload
+
+      await fetchProducts({ page: 1 });
+      setFile(null);
     } catch (error) {
       setUploadPhase('failed');
       setMessage(
