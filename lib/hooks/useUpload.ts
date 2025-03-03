@@ -12,6 +12,7 @@ export function useUpload() {
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
   const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
@@ -47,25 +48,28 @@ export function useUpload() {
     try {
       setUploadPhase('uploading');
       setMessage('Sending to server...');
+      await delay(500);
       const { jobIds } = await uploadCsv(file);
       setJobIds(jobIds);
 
       setUploadPhase('processing');
       setMessage('Processing data on the backend...');
+      await delay(500);
 
       let allCompletedOrFailed = false;
       while (!allCompletedOrFailed) {
         setMessage('Saving to database...');
         const statuses = await fetchAllUploadStatuses();
         allCompletedOrFailed = statuses.every(
-          (status) => status.status === 'completed' || status.status === 'failed',
+          (status) => status.status === 'completed' || status.status === 'failed'
         );
         if (!allCompletedOrFailed) {
+          await delay(1000);
         }
       }
 
       const hasErrors = Object.values(useAppStore.getState().uploadStatuses).some(
-        (status) => status.errors && status.errors.length > 0,
+        (status) => status.errors && status.errors.length > 0
       );
       if (hasErrors) {
         setUploadPhase('completed');
@@ -73,7 +77,9 @@ export function useUpload() {
       } else {
         setUploadPhase('completed');
         setMessage('Upload completed successfully!');
+        await delay(2000);
       }
+      setFile(null); // Limpar o arquivo após upload
     } catch (error) {
       setUploadPhase('failed');
       setMessage(
@@ -83,7 +89,7 @@ export function useUpload() {
             : error instanceof Error
             ? error.message
             : 'Unknown error'
-        }`,
+        }`
       );
     }
   };

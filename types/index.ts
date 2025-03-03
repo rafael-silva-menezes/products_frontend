@@ -29,3 +29,13 @@ export interface UploadResponse {
   message: string;
   jobIds: string[];
 }
+
+export interface GetProductsParams {
+  page?: number;
+  limit?: number;
+  name?: string;
+  price?: number;
+  expiration?: string;
+  sortBy?: 'name' | 'price' | 'expiration';
+  order?: 'ASC' | 'DESC';
+}
