@@ -11,7 +11,7 @@ export function useUpload() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; 
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
@@ -55,24 +55,12 @@ export function useUpload() {
 
       let allCompletedOrFailed = false;
       while (!allCompletedOrFailed) {
+        setMessage('Saving to database...');
         const statuses = await fetchAllUploadStatuses();
-        const totalProcessed = statuses.reduce(
-          (sum, status) => sum + (status.processed || 0),
-          0,
-        );
-        const totalErrors = statuses.reduce(
-          (sum, status) => sum + (status.errors?.length || 0),
-          0,
-        );
-        setMessage(
-          `Saving to database... (${totalProcessed} rows processed, ${totalErrors} errors)`,
-        );
-
         allCompletedOrFailed = statuses.every(
           (status) => status.status === 'completed' || status.status === 'failed',
         );
         if (!allCompletedOrFailed) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
 
