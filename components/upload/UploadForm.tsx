@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useUpload } from '../lib/hooks/useUpload';
+import { useUpload } from '../../lib/hooks/useUpload';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 
