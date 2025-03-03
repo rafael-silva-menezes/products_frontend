@@ -1,7 +1,7 @@
 'use client';
 
 import { UploadForm } from '../components/UploadForm';
-import { ProductsTable } from '../components/ProductsTable';
+import { ProductsTable } from '../components/products/ProductsTable';
 
 export default function Home() {
   return (

@@ -1,63 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { useAppStore } from '../lib/store';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import sanitizeHtml from 'sanitize-html';
+import { useProductTable } from '@/lib/hooks/useProductTable';
+import { Filters } from './Filters';
+import { Pagination } from './Pagination';
 
 export function ProductsTable() {
   const {
-    jobIds,
     products,
-    uploadStatuses,
+    allErrors,
     page,
     limit,
     totalPages,
-    nameFilter,
-    priceFilter,
-    expirationFilter,
+    isLoading,
+    isTransitioning,
+    localNameFilter,
+    localPriceFilter,
+    localExpirationFilter,
     sortBy,
     order,
-    isLoading,
-    shouldFetchStatuses,
-    fetchAllUploadStatuses,
-    fetchProducts,
-    setNameFilter,
-    setPriceFilter,
-    setExpirationFilter,
-    setSort,
+    setLocalNameFilter,
+    setLocalPriceFilter,
+    setLocalExpirationFilter,
+    handleSort,
+    handlePageChange,
     setLimit,
-    clearUploadStatuses,
-  } = useAppStore();
+  } = useProductTable();
 
-  const [localNameFilter, setLocalNameFilter] = useState(nameFilter);
-  const [localPriceFilter, setLocalPriceFilter] = useState(priceFilter);
-  const [localExpirationFilter, setLocalExpirationFilter] = useState(expirationFilter);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isMounted, setIsMounted] = useState(false); 
+  const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-    fetchProducts(); 
-  }, [fetchProducts]);
-
-  useEffect(() => {
-    if (jobIds.length > 0 && shouldFetchStatuses) {
-      fetchAllUploadStatuses();
-    }
-  }, [jobIds, shouldFetchStatuses, fetchAllUploadStatuses]);
-
-  const allErrors = Object.values(uploadStatuses)
-    .filter((status) => status?.errors && status.errors.length > 0)
-    .flatMap((status) => status.errors || []);
+  if (!isMounted) {
+    setTimeout(() => setIsMounted(true), 0);
+    return null;
+  }
 
   const exportToCsv = () => {
     const headers = ['Name', 'Price', 'Expiration', 'USD', 'EUR', 'GBP', 'JPY', 'BRL'];
@@ -80,44 +58,11 @@ export function ProductsTable() {
     URL.revokeObjectURL(link.href);
   };
 
-  const handleFilterChange = (
-    setter: (value: string) => void,
-    value: string,
-    storeSetter: (value: string) => void
-  ) => {
-    setter(value);
-    setTimeout(() => {
-      clearUploadStatuses();
-      storeSetter(value);
-    }, 300);
-  };
-
-  const handleSort = (column: 'name' | 'price' | 'expiration') => {
-    const newOrder = sortBy === column && order === 'ASC' ? 'DESC' : 'ASC';
-    clearUploadStatuses();
-    setSort(column, newOrder);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages && !isLoading) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        clearUploadStatuses();
-        fetchProducts({ page: newPage });
-        setIsTransitioning(false);
-      }, 300);
-    }
-  };
-
-  if (!isMounted) return null;
-
   return (
     <div>
       {allErrors.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
-            Errors in Upload
-          </h2>
+          <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">Errors in Upload</h2>
           <ul className="list-disc pl-5">
             {allErrors.map((error, index) => (
               <li key={index} className="text-sm text-red-500 dark:text-red-300">
@@ -128,39 +73,16 @@ export function ProductsTable() {
         </div>
       )}
       <div className="flex justify-between mb-4 flex-wrap gap-4">
-        <div className="flex gap-4 flex-wrap">
-          <input
-            type="text"
-            placeholder="Filter by name..."
-            value={localNameFilter}
-            onChange={(e) => handleFilterChange(setLocalNameFilter, e.target.value, setNameFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          />
-          <input
-            type="number"
-            placeholder="Filter by price..."
-            value={localPriceFilter}
-            onChange={(e) => handleFilterChange(setLocalPriceFilter, e.target.value, setPriceFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-32 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          />
-          <input
-            type="date"
-            placeholder="Filter by expiration..."
-            value={localExpirationFilter}
-            onChange={(e) => handleFilterChange(setLocalExpirationFilter, e.target.value, setExpirationFilter)}
-            className="border border-gray-300 rounded p-2 text-sm w-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          />
-          <select
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
-            className="border border-gray-300 rounded p-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          >
-            <option value={10}>10 per page</option>
-            <option value={20}>20 per page</option>
-            <option value={50}>50 per page</option>
-            <option value={100}>100 per page</option>
-          </select>
-        </div>
+        <Filters
+          localNameFilter={localNameFilter}
+          localPriceFilter={localPriceFilter}
+          localExpirationFilter={localExpirationFilter}
+          setLocalNameFilter={setLocalNameFilter}
+          setLocalPriceFilter={setLocalPriceFilter}
+          setLocalExpirationFilter={setLocalExpirationFilter}
+          limit={limit}
+          setLimit={setLimit}
+        />
         <Button onClick={exportToCsv}>Export to CSV</Button>
       </div>
       <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
@@ -219,23 +141,13 @@ export function ProductsTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4 flex justify-between">
-        <Button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1 || isLoading}
-          className={isTransitioning ? 'opacity-50' : 'opacity-100'}
-        >
-          Previous
-        </Button>
-        <span className="dark:text-gray-300">Page {page} of {totalPages}</span>
-        <Button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === totalPages || isLoading}
-          className={isTransitioning ? 'opacity-50' : 'opacity-100'}
-        >
-          Next
-        </Button>
-      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        isLoading={isLoading}
+        isTransitioning={isTransitioning}
+        handlePageChange={handlePageChange}
+      />
     </div>
   );
 }
