@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { uploadCsv } from "../api";
-import { useAppStore } from "../store";
-
+import { useState } from 'react';
+import { uploadCsv } from '../api';
+import { useAppStore } from '../store';
 
 type UploadPhase = 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
 
@@ -12,7 +11,7 @@ export function useUpload() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
@@ -88,7 +87,15 @@ export function useUpload() {
       }
     } catch (error) {
       setUploadPhase('failed');
-      setMessage(`Upload error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setMessage(
+        `Upload error: ${
+          error instanceof Error && error.message.includes('timeout')
+            ? 'Upload timed out after 30 seconds.'
+            : error instanceof Error
+            ? error.message
+            : 'Unknown error'
+        }`,
+      );
     }
   };
 

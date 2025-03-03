@@ -3,6 +3,7 @@ import { ProductsResponse, UploadStatus, UploadResponse } from '../types';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  timeout: 30000,
 });
 
 export const uploadCsv = async (file: File): Promise<UploadResponse> => {
