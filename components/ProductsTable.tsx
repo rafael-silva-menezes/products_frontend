@@ -39,7 +39,8 @@ export function ProductsTable() {
   const [localNameFilter, setLocalNameFilter] = useState(nameFilter);
   const [localPriceFilter, setLocalPriceFilter] = useState(priceFilter);
   const [localExpirationFilter, setLocalExpirationFilter] = useState(expirationFilter);
-  const [isTransitioning, setIsTransitioning] = useState(false); 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [visibleProducts, setVisibleProducts] = useState(products);
 
   useEffect(() => {
     if (jobIds.length > 0) {
@@ -47,6 +48,18 @@ export function ProductsTable() {
       fetchProducts();
     }
   }, [jobIds, page, limit, fetchAllUploadStatuses, fetchProducts]);
+
+  useEffect(() => {
+    if (!isLoading && products.length > 0) {
+      setIsTransitioning(true);
+      setVisibleProducts([]); 
+      const timer = setTimeout(() => {
+        setVisibleProducts(products);
+        setIsTransitioning(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [products, isLoading]);
 
   const allErrors = Object.values(uploadStatuses)
     .filter((status) => status?.errors && status.errors.length > 0)
@@ -93,7 +106,7 @@ export function ProductsTable() {
       setTimeout(() => {
         fetchProducts({ page: newPage });
         setIsTransitioning(false);
-      }, 300);
+      }, 500);
     }
   };
 
@@ -149,7 +162,7 @@ export function ProductsTable() {
         </div>
         <Button onClick={exportToCsv}>Export to CSV</Button>
       </div>
-      <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
+      <div className={`transition-opacity duration-500 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -176,9 +189,13 @@ export function ProductsTable() {
                   Loading...
                 </TableCell>
               </TableRow>
-            ) : products.length > 0 ? (
-              products.map((product) => (
-                <TableRow key={product.id}>
+            ) : visibleProducts.length > 0 ? (
+              visibleProducts.map((product, index) => (
+                <TableRow
+                  key={product.id}
+                  className="transition-opacity duration-500"
+                  style={{ animationDelay: `${index * 50}ms`, animation: 'fadeIn 0.5s ease-in' }}
+                >
                   <TableCell className="dark:text-gray-200">
                     <span
                       dangerouslySetInnerHTML={{
@@ -222,6 +239,20 @@ export function ProductsTable() {
           Next
         </Button>
       </div>
+
+      {/* CSS embutido para animação fadeIn */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
