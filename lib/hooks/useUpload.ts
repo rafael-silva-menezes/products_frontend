@@ -11,10 +11,11 @@ export function useUpload() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { setJobIds, fetchAllUploadStatuses } = useAppStore();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024;
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
+    setMessage('Validating file...');
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
 
@@ -45,12 +46,12 @@ export function useUpload() {
 
     try {
       setUploadPhase('uploading');
-      setMessage('Sending file...');
+      setMessage('Sending to server...');
       const { jobIds } = await uploadCsv(file);
       setJobIds(jobIds);
 
       setUploadPhase('processing');
-      setMessage('File uploaded. Processing on the backend...');
+      setMessage('Processing data on the backend...');
 
       let allCompletedOrFailed = false;
       while (!allCompletedOrFailed) {
@@ -64,7 +65,7 @@ export function useUpload() {
           0,
         );
         setMessage(
-          `Processing... (${totalProcessed} rows processed, ${totalErrors} errors)`,
+          `Saving to database... (${totalProcessed} rows processed, ${totalErrors} errors)`,
         );
 
         allCompletedOrFailed = statuses.every(
@@ -90,7 +91,7 @@ export function useUpload() {
       setMessage(
         `Upload error: ${
           error instanceof Error && error.message.includes('timeout')
-            ? 'Upload timed out after 30 seconds.'
+            ? 'Upload timed out after 60 seconds.'
             : error instanceof Error
             ? error.message
             : 'Unknown error'
