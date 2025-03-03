@@ -27,6 +27,7 @@ export function ProductsTable() {
     sortBy,
     order,
     isLoading,
+    shouldFetchStatuses,
     fetchAllUploadStatuses,
     fetchProducts,
     setNameFilter,
@@ -34,19 +35,25 @@ export function ProductsTable() {
     setExpirationFilter,
     setSort,
     setLimit,
+    clearUploadStatuses,
   } = useAppStore();
 
   const [localNameFilter, setLocalNameFilter] = useState(nameFilter);
   const [localPriceFilter, setLocalPriceFilter] = useState(priceFilter);
   const [localExpirationFilter, setLocalExpirationFilter] = useState(expirationFilter);
-  const [isTransitioning, setIsTransitioning] = useState(false); 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (jobIds.length > 0) {
+    setIsMounted(true);
+    fetchProducts(); 
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    if (jobIds.length > 0 && shouldFetchStatuses) {
       fetchAllUploadStatuses();
-      fetchProducts();
     }
-  }, [jobIds, page, limit, fetchAllUploadStatuses, fetchProducts]);
+  }, [jobIds, shouldFetchStatuses, fetchAllUploadStatuses]);
 
   const allErrors = Object.values(uploadStatuses)
     .filter((status) => status?.errors && status.errors.length > 0)
@@ -79,11 +86,15 @@ export function ProductsTable() {
     storeSetter: (value: string) => void
   ) => {
     setter(value);
-    setTimeout(() => storeSetter(value), 300);
+    setTimeout(() => {
+      clearUploadStatuses();
+      storeSetter(value);
+    }, 300);
   };
 
   const handleSort = (column: 'name' | 'price' | 'expiration') => {
     const newOrder = sortBy === column && order === 'ASC' ? 'DESC' : 'ASC';
+    clearUploadStatuses();
     setSort(column, newOrder);
   };
 
@@ -91,11 +102,14 @@ export function ProductsTable() {
     if (newPage >= 1 && newPage <= totalPages && !isLoading) {
       setIsTransitioning(true);
       setTimeout(() => {
+        clearUploadStatuses();
         fetchProducts({ page: newPage });
         setIsTransitioning(false);
       }, 300);
     }
   };
+
+  if (!isMounted) return null;
 
   return (
     <div>

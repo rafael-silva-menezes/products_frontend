@@ -11,7 +11,7 @@ export function useUpload() {
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { setJobIds, fetchAllUploadStatuses, fetchProducts } = useAppStore();
+  const { setJobIds, fetchAllUploadStatuses, fetchProducts, clearUploadStatuses } = useAppStore();
 
   const MAX_FILE_SIZE = 1 * 1024 * 1024 * 1024;
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -48,6 +48,7 @@ export function useUpload() {
     if (!file) return;
 
     try {
+      clearUploadStatuses();
       setUploadPhase('uploading');
       setMessage('Sending to server...');
       await delay(500);

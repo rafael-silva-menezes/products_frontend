@@ -16,6 +16,7 @@ interface AppState {
   sortBy: 'name' | 'price' | 'expiration' | null;
   order: 'ASC' | 'DESC';
   isLoading: boolean;
+  shouldFetchStatuses: boolean;
   setJobIds: (jobIds: string[]) => void;
   fetchUploadStatus: (jobId: string) => Promise<UploadStatus>;
   fetchAllUploadStatuses: () => Promise<UploadStatus[]>;
@@ -25,6 +26,8 @@ interface AppState {
   setExpirationFilter: (expiration: string) => void;
   setSort: (sortBy: 'name' | 'price' | 'expiration' | null, order: 'ASC' | 'DESC') => void;
   setLimit: (limit: number) => void;
+  clearUploadStatuses: () => void;
+  setShouldFetchStatuses: (value: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -42,7 +45,8 @@ export const useAppStore = create<AppState>()(
       sortBy: null,
       order: 'ASC',
       isLoading: false,
-      setJobIds: (jobIds: string[]) => set({ jobIds }),
+      shouldFetchStatuses: false,
+      setJobIds: (jobIds: string[]) => set({ jobIds, shouldFetchStatuses: true }),
       fetchUploadStatus: async (jobId: string) => {
         const status = await getUploadStatus(jobId);
         set((state) => ({
@@ -96,6 +100,8 @@ export const useAppStore = create<AppState>()(
         set({ limit, page: 1 });
         get().fetchProducts();
       },
+      clearUploadStatuses: () => set({ uploadStatuses: {}, shouldFetchStatuses: false }),
+      setShouldFetchStatuses: (value: boolean) => set({ shouldFetchStatuses: value }),
     }),
     {
       name: 'app-storage',
