@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { useAppStore } from '../lib/store';
 import sanitizeHtml from 'sanitize-html';
+import { Product } from '@/types';
 
 export function ProductsTable() {
   const {
@@ -40,23 +41,25 @@ export function ProductsTable() {
   const [localPriceFilter, setLocalPriceFilter] = useState(priceFilter);
   const [localExpirationFilter, setLocalExpirationFilter] = useState(expirationFilter);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [visibleProducts, setVisibleProducts] = useState(products);
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     if (jobIds.length > 0) {
       fetchAllUploadStatuses();
-      fetchProducts();
+      fetchProducts(); 
+    } else if (products.length === 0 && !isLoading) {
+      fetchProducts({ page: 1 });
     }
-  }, [jobIds, page, limit, fetchAllUploadStatuses, fetchProducts]);
+  }, [jobIds, page, limit, fetchAllUploadStatuses, fetchProducts, products.length, isLoading]);
 
   useEffect(() => {
-    if (!isLoading && products.length > 0) {
+    if (!isLoading) {
       setIsTransitioning(true);
-      setVisibleProducts([]); 
+      setVisibleProducts([]);
       const timer = setTimeout(() => {
         setVisibleProducts(products);
         setIsTransitioning(false);
-      }, 100);
+      }, 300); 
       return () => clearTimeout(timer);
     }
   }, [products, isLoading]);
@@ -106,7 +109,7 @@ export function ProductsTable() {
       setTimeout(() => {
         fetchProducts({ page: newPage });
         setIsTransitioning(false);
-      }, 500);
+      }, 800); 
     }
   };
 
@@ -162,7 +165,7 @@ export function ProductsTable() {
         </div>
         <Button onClick={exportToCsv}>Export to CSV</Button>
       </div>
-      <div className={`transition-opacity duration-500 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
+      <div className={`transition-opacity duration-800 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -193,8 +196,12 @@ export function ProductsTable() {
               visibleProducts.map((product, index) => (
                 <TableRow
                   key={product.id}
-                  className="transition-opacity duration-500"
-                  style={{ animationDelay: `${index * 50}ms`, animation: 'fadeIn 0.5s ease-in' }}
+                  className="transition-opacity duration-500 ease-in-out"
+                  style={{
+                    animation: 'fadeInUp 0.5s ease-in-out',
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: 'both',
+                  }}
                 >
                   <TableCell className="dark:text-gray-200">
                     <span
@@ -240,9 +247,8 @@ export function ProductsTable() {
         </Button>
       </div>
 
-      {/* CSS embutido para animação fadeIn */}
       <style jsx>{`
-        @keyframes fadeIn {
+        @keyframes fadeInUp {
           from {
             opacity: 0;
             transform: translateY(10px);
