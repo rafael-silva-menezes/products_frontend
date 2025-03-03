@@ -6,6 +6,12 @@ jest.mock('@/lib/hooks/useUpload');
 jest.mock('next-themes', () => ({
   useTheme: jest.fn(() => ({ theme: 'light', setTheme: jest.fn() })),
 }));
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, ...props }: React.ComponentProps<'button'> & { children: React.ReactNode }) => (
+    <button {...props}>{children}</button>
+  ),
+}));
+
 
 describe('UploadForm', () => {
   const mockUseUpload = {
