@@ -33,8 +33,7 @@ describe('useProductTable', () => {
   };
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (useAppStore as any).mockReturnValue(mockStore);
+    (useAppStore as jest.MockedFunction<typeof useAppStore>).mockReturnValue(mockStore);
   });
 
   afterEach(() => {
@@ -46,7 +45,7 @@ describe('useProductTable', () => {
 
     await act(async () => {
       result.current.setLocalNameFilter('test');
-      await new Promise((resolve) => setTimeout(resolve, 300)); // Espera o debounce
+      await new Promise((resolve) => setTimeout(resolve, 300));
     });
 
     expect(mockStore.setNameFilter).toHaveBeenCalledWith('test');
