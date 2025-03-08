@@ -1,6 +1,6 @@
-# Flatirons Frontend (React/Next.js)
+# CSV Upload Frontend (React/Next.js)
 
-This is the frontend application for the Flatirons project, built with React and Next.js. It provides a user interface for uploading CSV files containing product data, processing them, and displaying the results in a paginated table with filtering and sorting capabilities. The application is designed to be robust, user-friendly, and scalable, with a focus on modern development practices.
+This is the frontend application for the CSV Upload project, built with React and Next.js. It provides a user interface for uploading CSV files containing product data, processing them, and displaying the results in a paginated table with filtering and sorting capabilities. The application is designed to be robust, user-friendly, and scalable, with a focus on modern development practices.
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ This is the frontend application for the Flatirons project, built with React and
 1. **Clone the Repository**:
    ```bash
    git clone <repository-url>
-   cd flatirons_frontend
+   cd products_frontend
    ```
 
 2. **Install Dependencies**:

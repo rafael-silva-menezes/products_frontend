@@ -2,7 +2,7 @@ import './globals.css';
 import { ThemeProvider } from 'next-themes';
 
 export const metadata = {
-  title: 'Flatirons Products',
+  title: 'CSV Upload',
   description: 'Upload and view product data',
 };
 
